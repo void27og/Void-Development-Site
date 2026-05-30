@@ -876,14 +876,13 @@ h3 {
   width: 38px;
   height: 38px;
   place-items: center;
-  border-radius: 13px;
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--rose);
+  filter: drop-shadow(0 0 12px rgba(255, 111, 174, 0.24));
 }
 
 .social-logo svg {
-  width: 23px;
-  height: 23px;
+  width: 28px;
+  height: 28px;
   fill: currentColor;
 }
 
@@ -894,13 +893,11 @@ h3 {
 }
 
 .snapchat-logo {
-  color: #0f0716;
-  background: #fffc00;
+  color: var(--gold);
 }
 
 .youtube-logo {
-  color: #ffffff;
-  background: #ff0033;
+  color: var(--velvet-2);
 }
 
 .social-list strong {
