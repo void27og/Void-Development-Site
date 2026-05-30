@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Void Development resource packs pulled from the Modrinth user profile.">
+  <title>Resource Packs | Void Development</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header" data-header>
+    <a class="brand" href="index.html" aria-label="Void Development home">
+      <span class="brand-mark">V</span>
+      <span>Void Development</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+      <span class="sr-only">Menu</span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="site-nav" id="site-nav" data-nav>
+      <a href="index.html">Home</a>
+      <a href="resource-packs.html" aria-current="page">Resource packs</a>
+      <a href="websites.html">Websites</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero gradient-hero">
+      <p class="eyebrow">Modrinth library</p>
+      <h1>Resource packs by Void Development.</h1>
+      <p>These cards load from the public Modrinth user profile and use each project&apos;s first gallery image as the main artwork.</p>
+    </section>
+
+    <section class="section-wrap">
+      <div class="resource-toolbar">
+        <div>
+          <p class="section-kicker">Live projects</p>
+          <h2>Available packs</h2>
+        </div>
+        <div class="resource-actions">
+          <button class="sort-toggle" type="button" data-sort-toggle aria-label="Sort downloads descending">
+            Downloads: high to low
+          </button>
+          <a class="button ghost dark" href="https://modrinth.com/user/voiddevelopment" target="_blank" rel="noreferrer">Open Modrinth</a>
+        </div>
+      </div>
+      <div class="pack-grid" data-pack-grid>
+        <article class="loading-card">Loading Modrinth projects...</article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Void Development</span>
+    <span>Data from the public Modrinth API.</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
