@@ -767,6 +767,7 @@ h3 {
 
 .profile-section {
   grid-template-columns: repeat(2, minmax(0, 430px));
+  justify-content: center;
   align-items: stretch;
   gap: 20px;
 }
@@ -830,6 +831,9 @@ h3 {
   color: var(--ink);
   background: #180d25;
   box-shadow: var(--shadow);
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
   opacity: 0;
   pointer-events: none;
   transform: translateY(6px);
@@ -866,9 +870,37 @@ h3 {
   background: rgba(255, 255, 255, 0.09);
 }
 
-.social-list span {
-  color: var(--muted);
-  font-weight: 900;
+.social-logo {
+  display: grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.social-logo svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+}
+
+.instagram-logo svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.snapchat-logo {
+  color: #0f0716;
+  background: #fffc00;
+}
+
+.youtube-logo {
+  color: #ffffff;
+  background: #ff0033;
 }
 
 .social-list strong {
