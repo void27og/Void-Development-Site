@@ -202,10 +202,10 @@ a {
 
 .soft-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
   gap: clamp(22px, 4vw, 44px);
   align-items: center;
-  min-height: 690px;
+  min-height: 590px;
   padding: clamp(20px, 3vw, 34px);
   overflow: hidden;
   background:
@@ -215,27 +215,31 @@ a {
   box-shadow: var(--shadow);
 }
 
-.hero-art {
+.hero-title-panel {
   position: relative;
-  min-height: 610px;
+  min-height: 520px;
+  display: flex;
+  align-items: flex-end;
   overflow: hidden;
   border-radius: 28px;
-  background: #05020a;
+  padding: clamp(26px, 5vw, 54px);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(143, 47, 97, 0.18)),
+    linear-gradient(135deg, rgba(111, 69, 216, 0.24), rgba(7, 3, 13, 0.54));
   border: 1px solid var(--line);
 }
 
-.hero-art::after {
+.hero-title-panel::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 42%, rgba(7, 3, 13, 0.68));
+  inset: auto 0 0;
+  height: 46%;
+  background: linear-gradient(180deg, transparent, rgba(7, 3, 13, 0.44));
 }
 
-.hero-art img {
-  width: 100%;
-  height: 100%;
-  min-height: inherit;
-  object-fit: cover;
+.hero-title-panel h1 {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-copy-block {
@@ -825,7 +829,7 @@ h3 {
     grid-template-columns: 1fr;
   }
 
-  .hero-art {
+  .hero-title-panel {
     min-height: 420px;
   }
 
@@ -911,7 +915,7 @@ h3 {
     width: 100%;
   }
 
-  .hero-art {
+  .hero-title-panel {
     min-height: 330px;
   }
 
