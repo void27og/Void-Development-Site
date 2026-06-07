@@ -5,6 +5,11 @@ const packGrid = document.querySelector("[data-pack-grid]");
 const sortToggle = document.querySelector("[data-sort-toggle]");
 let currentPacks = [];
 let currentSort = "desc";
+let galaxyAnimationFrame = 0;
+let galaxyIdleTimer = 0;
+let spaceDriftFrame = 0;
+let spaceDriftItems = [];
+let spaceDriftInitialized = false;
 
 const fallbackPacks = [
   {
@@ -135,6 +140,115 @@ function initPageTransitions() {
   });
 }
 
+function initGalaxy() {
+  const field = document.createElement("div");
+  field.className = "galaxy-field";
+  field.setAttribute("aria-hidden", "true");
+  field.innerHTML = `
+    <img class="galaxy-image galaxy-image--main" src="assets/spiral.jpg" alt="">
+  `;
+  document.body.prepend(field);
+}
+
+function initScrollReveal() {
+  const targets = document.querySelectorAll(
+    ".hero, .page-hero, .section-title-band, .feature-card, .studio-panel, .mini-grid article, .pack-card, .website-card, .profile-card, .socials-card, .loading-card",
+  );
+
+  if (!targets.length) return;
+
+  targets.forEach((target) => target.classList.add("reveal-on-scroll"));
+
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((target) => target.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+  targets.forEach((target) => observer.observe(target));
+}
+
+function initSpaceDrift() {
+  document.documentElement.classList.add("space-scene-ready");
+}
+
+function initRotaryGalaxy() {
+  const rotaries = [...document.querySelectorAll("[data-rotary-galaxy]")].map((rotary) => ({
+    rotary,
+    links: [...rotary.querySelectorAll("[data-rotary-link]")],
+  })).filter((item) => item.links.length);
+
+  if (!rotaries.length) return;
+
+  let frame = 0;
+
+  function updateRotary() {
+    rotaries.forEach(({ rotary, links }) => {
+      const rect = rotary.getBoundingClientRect();
+      const isCompact = rotary.classList.contains("social-rotary") || rotary.classList.contains("compact-rotary");
+      const progress = isCompact
+        ? Math.min(1, Math.max(0, (window.innerHeight * 0.55 - rect.top) / Math.max(1, window.innerHeight * 0.9)))
+        : Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height - window.innerHeight)));
+      const rotation = progress * 292;
+      const activeIndex = Math.min(links.length - 1, Math.floor(progress * links.length));
+
+      rotary.style.setProperty("--dial-rotation", `${rotation.toFixed(2)}deg`);
+      rotary.style.setProperty("--dial-scale", `${(0.96 + Math.sin(progress * Math.PI) * 0.08).toFixed(3)}`);
+
+      links.forEach((link, index) => {
+        link.classList.toggle("is-active", index === activeIndex);
+      });
+    });
+  }
+
+  function requestRotaryUpdate() {
+    window.cancelAnimationFrame(frame);
+    frame = window.requestAnimationFrame(updateRotary);
+  }
+
+  updateRotary();
+  window.addEventListener("scroll", requestRotaryUpdate, { passive: true });
+  window.addEventListener("resize", requestRotaryUpdate);
+}
+
+function initSocialIconSwap() {
+  const display = document.querySelector("[data-social-display]");
+  const links = [...document.querySelectorAll("[data-social-icon]")];
+  if (!display || !links.length) return;
+
+  const icons = {
+    github: `<svg viewBox="0 0 24 24" role="img"><path d="M12 2.3a9.7 9.7 0 0 0-3.1 18.9c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.6 2.5 1.1 3.1.9.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-4.8 0-1.1.4-1.9 1-2.6-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.2 9.2 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.5 1 2.6 0 3.7-2.3 4.5-4.6 4.8.4.3.8 1 .8 2v2.4c0 .3.2.6.7.5A9.7 9.7 0 0 0 12 2.3Z"/></svg>`,
+    instagram: `<svg viewBox="0 0 24 24" role="img"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.4"/><circle cx="16.8" cy="7.2" r="1"/></svg>`,
+    snapchat: `<svg viewBox="0 0 24 24" role="img"><path d="M12 3.4c2.4 0 4.2 1.9 4.2 4.5v2.4c0 .5.4.9 1.3 1.2.6.2 1.1.4 1.1.9 0 .6-.8 1-1.7 1.2-.2.1-.3.4-.1.7.5.8 1.2 1.1 2.1 1.4.4.1.6.5.5.9-.1.5-.7.7-1.2.8-.8.1-1.6.3-2.1.9-.4.4-.8.7-1.5.5-.8-.2-1.5-.7-2.6-.7s-1.8.5-2.6.7c-.7.2-1.1-.1-1.5-.5-.5-.6-1.3-.8-2.1-.9-.5-.1-1.1-.3-1.2-.8-.1-.4.1-.8.5-.9.9-.3 1.6-.6 2.1-1.4.2-.3.1-.6-.1-.7-.9-.2-1.7-.6-1.7-1.2 0-.5.5-.7 1.1-.9.9-.3 1.3-.7 1.3-1.2V7.9c0-2.6 1.8-4.5 4.2-4.5Z"/></svg>`,
+    youtube: `<svg viewBox="0 0 24 24" role="img"><path d="M21 8.1a3 3 0 0 0-2.1-2.1C17 5.5 12 5.5 12 5.5s-5 0-6.9.5A3 3 0 0 0 3 8.1 31 31 0 0 0 2.5 12c0 1.4.2 2.8.5 3.9A3 3 0 0 0 5.1 18c1.9.5 6.9.5 6.9.5s5 0 6.9-.5a3 3 0 0 0 2.1-2.1c.3-1.1.5-2.5.5-3.9s-.2-2.8-.5-3.9ZM10.2 15V9l5.2 3-5.2 3Z"/></svg>`,
+  };
+
+  function setIcon(name) {
+    if (!icons[name] || display.dataset.activeSocial === name) return;
+    display.dataset.activeSocial = name;
+    display.classList.add("is-switching");
+    window.setTimeout(() => {
+      display.innerHTML = `<span class="social-logo showcase-logo ${name}-logo">${icons[name]}</span>`;
+      display.classList.remove("is-switching");
+    }, 90);
+  }
+
+  links.forEach((link) => {
+    link.addEventListener("mouseenter", () => setIcon(link.dataset.socialIcon));
+    link.addEventListener("focus", () => setIcon(link.dataset.socialIcon));
+  });
+
+  setIcon(links[0].dataset.socialIcon);
+}
+
 function formatNumber(value) {
   return new Intl.NumberFormat("en", { notation: value >= 10000 ? "compact" : "standard" }).format(value || 0);
 }
@@ -204,6 +318,9 @@ function renderPacks(packs, isFallback = false) {
   if (isFallback) {
     packGrid.insertAdjacentHTML("afterbegin", `<article class="loading-card warning">Showing fallback pack names because live Modrinth data could not be reached.</article>`);
   }
+
+  initScrollReveal();
+  initSpaceDrift();
 }
 
 async function loadModrinthPacks() {
@@ -247,8 +364,13 @@ if (sortToggle) {
 }
 
 syncHeader();
+initGalaxy();
 initNavPill();
 initPageTransitions();
+initScrollReveal();
+initSpaceDrift();
+initRotaryGalaxy();
+initSocialIconSwap();
 loadModrinthPacks();
 if (packGrid) {
   window.setInterval(() => {
