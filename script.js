@@ -195,7 +195,7 @@ function initRotaryGalaxy() {
       const rect = rotary.getBoundingClientRect();
       const isCompact = rotary.classList.contains("social-rotary") || rotary.classList.contains("compact-rotary");
       const progress = isCompact
-        ? Math.min(1, Math.max(0, (window.innerHeight * 0.55 - rect.top) / Math.max(1, window.innerHeight * 0.9)))
+        ? Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height - window.innerHeight * 0.9)))
         : Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height - window.innerHeight)));
       const rotation = progress * 292;
       const activeIndex = Math.min(links.length - 1, Math.floor(progress * links.length));

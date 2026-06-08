@@ -33,9 +33,15 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(135deg, rgba(143, 47, 97, 0.28), transparent 34%),
-    linear-gradient(225deg, rgba(111, 69, 216, 0.22), transparent 38%),
-    linear-gradient(180deg, var(--bg) 0%, #12071b 48%, #09040f 100%);
+    radial-gradient(circle at 8% 18%, rgba(255, 255, 255, 0.32) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 24% 72%, rgba(255, 255, 255, 0.2) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 45% 28%, rgba(255, 255, 255, 0.24) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 66% 66%, rgba(255, 255, 255, 0.18) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 82% 20%, rgba(255, 255, 255, 0.26) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 50% 42%, rgba(24, 10, 38, 0.2), transparent 42%),
+    linear-gradient(180deg, #010008 0%, #000004 48%, #020006 100%);
+  background-size: 310px 310px, 390px 390px, 510px 510px, 460px 460px, 350px 350px, auto, auto;
+  background-attachment: fixed;
   font-family: Inter, Arial, sans-serif;
   line-height: 1.5;
   opacity: 0;
@@ -54,7 +60,6 @@ body.is-leaving {
 }
 
 .galaxy-field {
-  display: none;
   position: fixed;
   inset: 0;
   z-index: 0;
@@ -64,6 +69,7 @@ body.is-leaving {
   pointer-events: none;
   opacity: 1;
   filter: saturate(1.25) contrast(1.06);
+  background: #000004;
 }
 
 .galaxy-field::before {
@@ -71,10 +77,29 @@ body.is-leaving {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 16% 22%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 74% 18%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1.7px),
-    radial-gradient(circle at 42% 68%, rgba(255, 255, 255, 0.13) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 88% 72%, rgba(255, 255, 255, 0.1) 0 1px, transparent 1.5px);
+    radial-gradient(circle at 8% 18%, rgba(255, 255, 255, 0.85) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 21% 76%, rgba(255, 255, 255, 0.44) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 43% 29%, rgba(255, 255, 255, 0.66) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 63% 64%, rgba(255, 255, 255, 0.48) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 81% 20%, rgba(255, 255, 255, 0.72) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 94% 82%, rgba(255, 255, 255, 0.5) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 50% 50%, rgba(255, 111, 174, 0.16), transparent 38%),
+    radial-gradient(circle at 12% 92%, rgba(184, 137, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(0, 0, 6, 0), rgba(0, 0, 6, 0.34));
+  background-size: 310px 310px, 390px 390px, 510px 510px, 460px 460px, 350px 350px, 620px 620px, auto, auto, auto;
+}
+
+.galaxy-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 72% 42%, rgba(255, 255, 255, 0.1) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 58% 86%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 50% 50%, transparent 0 52%, rgba(0, 0, 6, 0.66) 100%);
+  background-size: 220px 220px, 280px 280px, 340px 340px, auto;
+  opacity: 0.9;
 }
 
 .galaxy-image {
@@ -91,8 +116,7 @@ body.is-leaving {
 }
 
 .galaxy-image--main {
-  opacity: 0.68;
-  filter: blur(14px) saturate(1.18) contrast(1.05);
+  display: none;
 }
 
 body::before {
@@ -102,8 +126,9 @@ body::before {
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(0, 0, 4, 0.08), rgba(0, 0, 4, 0.01) 42%, rgba(0, 0, 4, 0.2)),
-    linear-gradient(90deg, rgba(0, 0, 4, 0.22), transparent 34%, transparent 66%, rgba(0, 0, 4, 0.22));
+    radial-gradient(circle at 50% 30%, rgba(143, 47, 97, 0.1), transparent 38%),
+    linear-gradient(180deg, rgba(0, 0, 6, 0.02), rgba(0, 0, 6, 0.01) 42%, rgba(0, 0, 6, 0.26)),
+    linear-gradient(90deg, rgba(0, 0, 6, 0.34), transparent 34%, transparent 66%, rgba(0, 0, 6, 0.34));
 }
 
 body > :not(.galaxy-field) {
@@ -156,16 +181,17 @@ a {
 }
 
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 14px;
-  z-index: 20;
+  left: 50%;
+  z-index: 1000;
   width: min(1180px, calc(100% - 28px));
   min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  margin: 14px auto 0;
+  margin: 0;
   padding: 10px 12px 10px 16px;
   color: var(--white);
   background:
@@ -175,6 +201,11 @@ a {
   border-radius: 999px;
   box-shadow: 0 18px 58px rgba(0, 0, 0, 0.24);
   backdrop-filter: blur(28px) saturate(165%);
+  transform: translateX(-50%);
+}
+
+main {
+  padding-top: 100px;
 }
 
 .site-header.is-scrolled {
@@ -722,6 +753,29 @@ h3 {
   line-height: 1.15;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.privacy-page .page-hero {
+  display: grid;
+  align-content: end;
+  min-height: 420px;
+  padding-top: clamp(74px, 10vw, 118px);
+}
+
+.privacy-page .page-hero h1 {
+  font-size: clamp(3.4rem, 9vw, 7rem);
+  line-height: 0.95;
+}
+
+.privacy-panel {
+  grid-template-columns: minmax(260px, 0.72fr) minmax(340px, 1fr);
+  align-items: start;
+  margin-top: 0;
+}
+
+.privacy-panel h2 {
+  max-width: 520px;
+  font-size: clamp(2.4rem, 5.2vw, 5.2rem);
 }
 
 .feature-split {
@@ -1625,6 +1679,10 @@ h3 {
 
   .rotary-galaxy {
     min-height: 360vh;
+  }
+
+  .compact-rotary {
+    min-height: 235vh;
   }
 
   .rotary-links a strong {
