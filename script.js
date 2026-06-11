@@ -3,6 +3,8 @@ const nav = document.querySelector("[data-nav]");
 const navToggle = document.querySelector("[data-nav-toggle]");
 const packGrid = document.querySelector("[data-pack-grid]");
 const sortToggle = document.querySelector("[data-sort-toggle]");
+const motionPreferenceKey = "voidDevelopmentMotionPreference";
+const motionPromptKey = "voidDevelopmentMotionPromptSeen";
 let currentPacks = [];
 let currentSort = "desc";
 let galaxyAnimationFrame = 0;
@@ -10,6 +12,77 @@ let galaxyIdleTimer = 0;
 let spaceDriftFrame = 0;
 let spaceDriftItems = [];
 let spaceDriftInitialized = false;
+
+const borderGlowSelector = [
+  ".page-hero",
+  ".section-title-band",
+  ".feature-card",
+  ".studio-panel",
+  ".glass-panel",
+  ".mini-grid article",
+  ".pack-card",
+  ".website-card",
+  ".loading-card",
+  ".profile-card",
+  ".socials-card",
+].join(", ");
+
+const gradientPositions = ["80% 55%", "69% 34%", "8% 6%", "41% 38%", "86% 85%", "82% 18%", "51% 4%"];
+const gradientKeys = [
+  "--gradient-one",
+  "--gradient-two",
+  "--gradient-three",
+  "--gradient-four",
+  "--gradient-five",
+  "--gradient-six",
+  "--gradient-seven",
+];
+const colorMap = [0, 1, 2, 0, 1, 2, 1];
+const navIcons = {
+  home: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.4 12 4l8 7.4v8.1a1 1 0 0 1-1 1h-4.4v-5.8H9.4v5.8H5a1 1 0 0 1-1-1v-8.1Z"/></svg>`,
+  packs: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.4 4.5 7.2 12 11l7.5-3.8L12 3.4Zm-8 6.2v7.3l7 3.6v-7.3L4 9.6Zm16 0-7 3.6v7.3l7-3.6V9.6Z"/></svg>`,
+  websites: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.3 5.2h15.4a1.8 1.8 0 0 1 1.8 1.8v9.6a1.8 1.8 0 0 1-1.8 1.8H4.3a1.8 1.8 0 0 1-1.8-1.8V7a1.8 1.8 0 0 1 1.8-1.8Zm.2 3v7.9h15V8.2h-15Zm4.2 12h6.6v1.4H8.7v-1.4Z"/></svg>`,
+  contact: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8 8 0 0 0-8 8v4.1c0 1.1.9 2 2 2h1.4v-5.4H5.8v-.7a6.2 6.2 0 0 1 12.4 0v.7h-1.6v5.4h1.8a3.6 3.6 0 0 1-3.5 2.9h-2.1v-1.6h2.1a2 2 0 0 0 1.9-1.3H18c1.1 0 2-.9 2-2v-4.1a8 8 0 0 0-8-8Z"/></svg>`,
+};
+
+function getSystemReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getMotionPreference() {
+  const storedPreference = localStorage.getItem(motionPreferenceKey);
+  if (storedPreference === "reduced") return true;
+  if (storedPreference === "full") return false;
+  return getSystemReducedMotion();
+}
+
+function isMotionReduced() {
+  return document.documentElement.classList.contains("motion-reduced");
+}
+
+function updateMotionToggle(toggle) {
+  const reduced = isMotionReduced();
+  toggle.setAttribute("aria-pressed", String(reduced));
+  toggle.setAttribute("aria-label", reduced ? "Enable full motion" : "Enable reduced motion");
+  toggle.title = reduced ? "Enable full motion" : "Enable reduced motion";
+}
+
+function applyMotionPreference(reduced, persist = true) {
+  document.documentElement.classList.toggle("motion-reduced", reduced);
+  document.body.classList.toggle("reduce-motion", reduced);
+
+  if (persist) {
+    localStorage.setItem(motionPreferenceKey, reduced ? "reduced" : "full");
+  }
+
+  document.querySelectorAll("[data-motion-toggle]").forEach(updateMotionToggle);
+  window.dispatchEvent(new CustomEvent("motionPreferenceChange", { detail: { reduced } }));
+}
+
+function setMotionPreferenceFromChoice(reduced) {
+  localStorage.setItem(motionPromptKey, "true");
+  applyMotionPreference(reduced);
+}
 
 const fallbackPacks = [
   {
@@ -89,32 +162,229 @@ function syncHeader() {
   header.classList.toggle("is-scrolled", window.scrollY > 8);
 }
 
-function syncNavPill(targetLink) {
-  if (!nav || !targetLink) return;
+function initMotionControls() {
+  applyMotionPreference(getMotionPreference(), false);
 
-  const navRect = nav.getBoundingClientRect();
-  const linkRect = targetLink.getBoundingClientRect();
-  nav.style.setProperty("--pill-x", `${linkRect.left - navRect.left}px`);
-  nav.style.setProperty("--pill-y", `${linkRect.top - navRect.top}px`);
-  nav.style.setProperty("--pill-width", `${linkRect.width}px`);
-  nav.style.setProperty("--pill-height", `${linkRect.height}px`);
+  if (header && !header.querySelector("[data-motion-toggle]")) {
+    const toggle = document.createElement("button");
+    toggle.className = "motion-toggle";
+    toggle.type = "button";
+    toggle.dataset.motionToggle = "true";
+    toggle.innerHTML = `
+      <span class="motion-toggle-icon" aria-hidden="true"></span>
+      <span class="motion-toggle-text">Motion</span>
+    `;
+    updateMotionToggle(toggle);
+    toggle.addEventListener("click", () => {
+      setMotionPreferenceFromChoice(!isMotionReduced());
+    });
+    header.insertBefore(toggle, navToggle || nav);
+  }
+
+  if (localStorage.getItem(motionPromptKey) === "true") return;
+
+  const dialog = document.createElement("section");
+  dialog.className = "motion-dialog";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", "motion-dialog-title");
+  dialog.innerHTML = `
+    <div class="motion-dialog-card">
+      <p class="section-kicker">Motion preference</p>
+      <h2 id="motion-dialog-title">Choose your motion level.</h2>
+      <p>This site uses animated stars, hover glow, and smooth transitions. Pick what feels best on your device.</p>
+      <div class="motion-dialog-actions">
+        <button class="button primary" type="button" data-motion-choice="full">Full motion</button>
+        <button class="button ghost" type="button" data-motion-choice="reduced">Reduced motion</button>
+      </div>
+    </div>
+  `;
+  document.body.append(dialog);
+
+  const choiceButtons = [...dialog.querySelectorAll("[data-motion-choice]")];
+  choiceButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setMotionPreferenceFromChoice(button.dataset.motionChoice === "reduced");
+      dialog.remove();
+    });
+  });
+  choiceButtons[0]?.focus({ preventScroll: true });
 }
 
-function initNavPill() {
+function parseHSL(hslStr) {
+  const match = hslStr.match(/([\d.]+)\s*([\d.]+)%?\s*([\d.]+)%?/);
+  if (!match) return { h: 40, s: 80, l: 80 };
+  return { h: parseFloat(match[1]), s: parseFloat(match[2]), l: parseFloat(match[3]) };
+}
+
+function applyGlowColorVars(card, glowColor, intensity) {
+  const { h, s, l } = parseHSL(glowColor);
+  const base = `${h}deg ${s}% ${l}%`;
+  const opacities = [100, 60, 50, 40, 30, 20, 10];
+  const keys = ["", "-60", "-50", "-40", "-30", "-20", "-10"];
+
+  opacities.forEach((opacity, index) => {
+    card.style.setProperty(`--glow-color${keys[index]}`, `hsl(${base} / ${Math.min(opacity * intensity, 100)}%)`);
+  });
+}
+
+function applyGradientVars(card, colors) {
+  gradientKeys.forEach((key, index) => {
+    const color = colors[Math.min(colorMap[index], colors.length - 1)];
+    card.style.setProperty(key, `radial-gradient(at ${gradientPositions[index]}, ${color} 0px, transparent 50%)`);
+  });
+  card.style.setProperty("--gradient-base", `linear-gradient(${colors[0]} 0 100%)`);
+}
+
+function getCenterOfElement(el) {
+  const { width, height } = el.getBoundingClientRect();
+  return [width / 2, height / 2];
+}
+
+function getEdgeProximity(el, x, y) {
+  const [cx, cy] = getCenterOfElement(el);
+  const dx = x - cx;
+  const dy = y - cy;
+  let kx = Infinity;
+  let ky = Infinity;
+  if (dx !== 0) kx = cx / Math.abs(dx);
+  if (dy !== 0) ky = cy / Math.abs(dy);
+  return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+}
+
+function getCursorAngle(el, x, y) {
+  const [cx, cy] = getCenterOfElement(el);
+  const dx = x - cx;
+  const dy = y - cy;
+  if (dx === 0 && dy === 0) return 0;
+
+  let degrees = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+  if (degrees < 0) degrees += 360;
+  return degrees;
+}
+
+function handleBorderGlowPointerMove(event) {
+  if (isMotionReduced()) return;
+
+  const card = event.currentTarget;
+  card._glowPointerX = event.clientX;
+  card._glowPointerY = event.clientY;
+
+  if (card._glowFrame) return;
+
+  card._glowFrame = window.requestAnimationFrame(() => {
+    const rect = card.getBoundingClientRect();
+    const x = card._glowPointerX - rect.left;
+    const y = card._glowPointerY - rect.top;
+    const edge = getEdgeProximity(card, x, y);
+    const angle = getCursorAngle(card, x, y);
+
+    card.style.setProperty("--edge-proximity", `${(edge * 100).toFixed(3)}`);
+    card.style.setProperty("--cursor-angle", `${angle.toFixed(3)}deg`);
+    card._glowFrame = 0;
+  });
+}
+
+function initBorderGlow() {
+  const cards = [...document.querySelectorAll(borderGlowSelector)];
+  if (!cards.length) return;
+
+  cards.forEach((card) => {
+    if (card.dataset.borderGlowReady === "true") return;
+
+    const radius = Number.parseFloat(getComputedStyle(card).borderRadius) || 26;
+    card.dataset.borderGlowReady = "true";
+    card.classList.add("border-glow-card");
+    card.style.setProperty("--card-bg", "#120f17");
+    card.style.setProperty("--edge-sensitivity", "30");
+    card.style.setProperty("--border-radius", `${radius}px`);
+    card.style.setProperty("--glow-padding", "34px");
+    card.style.setProperty("--cone-spread", "25");
+    card.style.setProperty("--fill-opacity", card.classList.contains("page-hero") ? "0.28" : "0.42");
+    applyGlowColorVars(card, "40 80 80", 1);
+    applyGradientVars(card, ["#c084fc", "#f472b6", "#38bdf8"]);
+
+    const edgeLight = document.createElement("span");
+    edgeLight.className = "edge-light";
+    edgeLight.setAttribute("aria-hidden", "true");
+    card.prepend(edgeLight);
+    card.addEventListener("pointermove", handleBorderGlowPointerMove);
+  });
+}
+
+function getNavIconKey(link) {
+  const href = link.getAttribute("href") || "";
+  if (href.includes("resource-packs")) return "packs";
+  if (href.includes("websites")) return "websites";
+  if (href.includes("contact")) return "contact";
+  return "home";
+}
+
+function setDockItemSize(link, size) {
+  link.style.setProperty("--dock-size", `${size.toFixed(2)}px`);
+}
+
+function syncDockMagnification(mouseX) {
+  if (!nav) return;
+  if (isMotionReduced()) {
+    resetDockMagnification();
+    return;
+  }
+
+  nav._dockMouseX = mouseX;
+
+  if (nav._dockFrame) return;
+
+  nav._dockFrame = window.requestAnimationFrame(() => {
+    const links = [...nav.querySelectorAll("a")];
+    const baseSize = 50;
+    const magnification = 70;
+    const distance = 180;
+    const sizes = links.map((link) => {
+      const rect = link.getBoundingClientRect();
+      const center = rect.left + rect.width / 2;
+      const proximity = Math.max(0, 1 - Math.abs(nav._dockMouseX - center) / distance);
+      return baseSize + (magnification - baseSize) * proximity;
+    });
+
+    links.forEach((link, index) => setDockItemSize(link, sizes[index]));
+    nav._dockFrame = 0;
+  });
+}
+
+function resetDockMagnification() {
+  if (!nav) return;
+  nav.querySelectorAll("a").forEach((link) => setDockItemSize(link, 50));
+}
+
+function initDockNav() {
   if (!nav) return;
 
   const links = [...nav.querySelectorAll("a")];
-  const activeLink = nav.querySelector("[aria-current='page']") || links[0];
-
-  syncNavPill(activeLink);
+  nav.setAttribute("role", "toolbar");
+  nav.setAttribute("aria-label", "Primary navigation dock");
 
   links.forEach((link) => {
-    link.addEventListener("mouseenter", () => syncNavPill(link));
-    link.addEventListener("focus", () => syncNavPill(link));
+    if (link.dataset.dockReady === "true") return;
+
+    const label = link.textContent.trim();
+    const iconKey = getNavIconKey(link);
+    link.dataset.dockReady = "true";
+    link.dataset.label = label;
+    link.setAttribute("aria-label", label);
+    link.innerHTML = `
+      <span class="dock-icon">${navIcons[iconKey]}</span>
+      <span class="dock-label" role="tooltip">${label}</span>
+    `;
+    setDockItemSize(link, 50);
+
+    link.addEventListener("focus", () => setDockItemSize(link, 70));
+    link.addEventListener("blur", () => setDockItemSize(link, 50));
   });
 
-  nav.addEventListener("mouseleave", () => syncNavPill(activeLink));
-  window.addEventListener("resize", () => syncNavPill(nav.querySelector("[aria-current='page']") || activeLink));
+  nav.addEventListener("mousemove", (event) => syncDockMagnification(event.clientX));
+  nav.addEventListener("mouseleave", resetDockMagnification);
+  window.addEventListener("resize", resetDockMagnification);
 }
 
 function initPageTransitions() {
@@ -142,12 +412,169 @@ function initPageTransitions() {
 
 function initGalaxy() {
   const field = document.createElement("div");
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { alpha: true });
+
   field.className = "galaxy-field";
   field.setAttribute("aria-hidden", "true");
-  field.innerHTML = `
-    <img class="galaxy-image galaxy-image--main" src="assets/spiral.jpg" alt="">
-  `;
+  canvas.className = "galaxy-canvas";
+  field.append(canvas);
   document.body.prepend(field);
+
+  if (!context) return;
+
+  let reducedMotion = isMotionReduced();
+  const smallScreen = window.matchMedia("(max-width: 760px)").matches;
+  const lowPower = (navigator.hardwareConcurrency || 4) <= 4 || smallScreen;
+  const maxDpr = lowPower ? 1 : 1.5;
+  const targetFps = lowPower ? 24 : 30;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let stars = [];
+  let lastFrame = 0;
+  let pointerX = 0.5;
+  let pointerY = 0.5;
+  let smoothPointerX = 0.5;
+  let smoothPointerY = 0.5;
+  let pointerActive = 0;
+  let smoothPointerActive = 0;
+
+  function randomBetween(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function createStars() {
+    const area = Math.min(1400000, width * height);
+    const density = lowPower ? 0.000105 : 0.00015;
+    const count = Math.max(90, Math.min(lowPower ? 170 : 260, Math.floor(area * density)));
+
+    stars = Array.from({ length: count }, () => {
+      const arm = Math.random() * Math.PI * 2;
+      const radius = Math.pow(Math.random(), 1.85);
+      const swirl = radius * 4.4;
+      const angle = arm + swirl + randomBetween(-0.55, 0.55);
+      const spread = randomBetween(-0.09, 0.09) * (1 - radius);
+      const hue = Math.random() > 0.56 ? randomBetween(255, 320) : randomBetween(188, 220);
+
+      return {
+        angle,
+        radius,
+        spread,
+        hue,
+        alpha: randomBetween(0.28, 0.92),
+        size: randomBetween(0.65, lowPower ? 1.45 : 1.9),
+        speed: randomBetween(0.000018, 0.00005) * (Math.random() > 0.5 ? 1 : -1),
+        twinkle: randomBetween(0.7, 1.8),
+      };
+    });
+  }
+
+  function resizeGalaxy() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    createStars();
+    drawGalaxy(performance.now());
+  }
+
+  function drawGalaxy(time) {
+    const cx = width * 0.5;
+    const cy = height * 0.52;
+    const maxRadius = Math.min(width, height) * (smallScreen ? 0.68 : 0.78);
+
+    context.clearRect(0, 0, width, height);
+    context.globalCompositeOperation = "source-over";
+    context.fillStyle = "#000004";
+    context.fillRect(0, 0, width, height);
+
+    const core = context.createRadialGradient(cx, cy, 0, cx, cy, maxRadius * 0.56);
+    core.addColorStop(0, "rgba(255, 111, 174, 0.16)");
+    core.addColorStop(0.25, "rgba(111, 69, 216, 0.13)");
+    core.addColorStop(1, "rgba(0, 0, 0, 0)");
+    context.fillStyle = core;
+    context.fillRect(0, 0, width, height);
+
+    smoothPointerX += (pointerX - smoothPointerX) * 0.045;
+    smoothPointerY += (pointerY - smoothPointerY) * 0.045;
+    smoothPointerActive += (pointerActive - smoothPointerActive) * 0.045;
+
+    context.globalCompositeOperation = "lighter";
+    stars.forEach((star) => {
+      const rotation = reducedMotion ? 0 : time * star.speed;
+      const angle = star.angle + rotation + star.spread;
+      const radius = star.radius * maxRadius;
+      const ellipseY = Math.sin(angle) * radius * 0.38;
+      let x = cx + Math.cos(angle) * radius;
+      let y = cy + ellipseY;
+
+      if (smoothPointerActive > 0.01) {
+        const dx = x - smoothPointerX * width;
+        const dy = y - smoothPointerY * height;
+        const distance = Math.max(70, Math.hypot(dx, dy));
+        const force = Math.max(0, 1 - distance / 260) * smoothPointerActive * 14;
+        x += (dx / distance) * force;
+        y += (dy / distance) * force;
+      }
+
+      const twinkle = reducedMotion ? 1 : 0.78 + Math.sin(time * 0.0012 * star.twinkle + star.angle * 8) * 0.22;
+      context.beginPath();
+      context.fillStyle = `hsla(${star.hue}, 88%, 78%, ${star.alpha * twinkle})`;
+      context.arc(x, y, star.size, 0, Math.PI * 2);
+      context.fill();
+    });
+
+    context.globalCompositeOperation = "source-over";
+  }
+
+  function animateGalaxy(time) {
+    if (reducedMotion) {
+      galaxyAnimationFrame = 0;
+      return;
+    }
+
+    galaxyAnimationFrame = window.requestAnimationFrame(animateGalaxy);
+    if (document.visibilityState !== "visible") return;
+    if (time - lastFrame < 1000 / targetFps) return;
+
+    lastFrame = time;
+    drawGalaxy(time);
+  }
+
+  function handleGalaxyPointerMove(event) {
+    pointerX = event.clientX / Math.max(1, width);
+    pointerY = event.clientY / Math.max(1, height);
+    pointerActive = 1;
+    window.clearTimeout(galaxyIdleTimer);
+    galaxyIdleTimer = window.setTimeout(() => {
+      pointerActive = 0;
+    }, 900);
+  }
+
+  resizeGalaxy();
+  window.addEventListener("resize", resizeGalaxy);
+  window.addEventListener("pointermove", handleGalaxyPointerMove, { passive: true });
+  window.addEventListener("motionPreferenceChange", (event) => {
+    reducedMotion = event.detail.reduced;
+    pointerActive = 0;
+    smoothPointerActive = 0;
+    if (reducedMotion) {
+      window.cancelAnimationFrame(galaxyAnimationFrame);
+      galaxyAnimationFrame = 0;
+      drawGalaxy(performance.now());
+    } else if (!galaxyAnimationFrame) {
+      galaxyAnimationFrame = window.requestAnimationFrame(animateGalaxy);
+    }
+  });
+
+  if (!reducedMotion) {
+    galaxyAnimationFrame = window.requestAnimationFrame(animateGalaxy);
+  }
 }
 
 function initScrollReveal() {
@@ -286,6 +713,7 @@ function renderPacks(packs, isFallback = false) {
 
   if (!resourcePacks.length) {
     packGrid.innerHTML = `<article class="loading-card">No resource packs found for this Modrinth profile.</article>`;
+    initBorderGlow();
     return;
   }
 
@@ -321,6 +749,7 @@ function renderPacks(packs, isFallback = false) {
 
   initScrollReveal();
   initSpaceDrift();
+  initBorderGlow();
 }
 
 async function loadModrinthPacks() {
@@ -347,7 +776,7 @@ if (navToggle && nav) {
   });
 
   nav.addEventListener("click", (event) => {
-    if (event.target instanceof HTMLAnchorElement) {
+    if (event.target instanceof Element && event.target.closest("a")) {
       nav.classList.remove("is-open");
       navToggle.setAttribute("aria-expanded", "false");
     }
@@ -364,11 +793,13 @@ if (sortToggle) {
 }
 
 syncHeader();
+initMotionControls();
 initGalaxy();
-initNavPill();
+initDockNav();
 initPageTransitions();
 initScrollReveal();
 initSpaceDrift();
+initBorderGlow();
 initRotaryGalaxy();
 initSocialIconSwap();
 loadModrinthPacks();
