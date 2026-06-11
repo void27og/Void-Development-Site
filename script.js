@@ -303,8 +303,8 @@ function initBorderGlow() {
     card.style.setProperty("--glow-padding", "34px");
     card.style.setProperty("--cone-spread", "25");
     card.style.setProperty("--fill-opacity", card.classList.contains("page-hero") ? "0.28" : "0.42");
-    applyGlowColorVars(card, "40 80 80", 1);
-    applyGradientVars(card, ["#c084fc", "#f472b6", "#38bdf8"]);
+    applyGlowColorVars(card, "212 88 86", 0.82);
+    applyGradientVars(card, ["#e8f2ff", "#6ea8ff", "#d8b978"]);
 
     const edgeLight = document.createElement("span");
     edgeLight.className = "edge-light";
@@ -457,7 +457,7 @@ function initGalaxy() {
       const swirl = radius * 4.4;
       const angle = arm + swirl + randomBetween(-0.55, 0.55);
       const spread = randomBetween(-0.09, 0.09) * (1 - radius);
-      const hue = Math.random() > 0.56 ? randomBetween(255, 320) : randomBetween(188, 220);
+      const hue = Math.random() > 0.82 ? randomBetween(40, 48) : randomBetween(195, 218);
 
       return {
         angle,
@@ -496,8 +496,8 @@ function initGalaxy() {
     context.fillRect(0, 0, width, height);
 
     const core = context.createRadialGradient(cx, cy, 0, cx, cy, maxRadius * 0.56);
-    core.addColorStop(0, "rgba(255, 111, 174, 0.16)");
-    core.addColorStop(0.25, "rgba(111, 69, 216, 0.13)");
+    core.addColorStop(0, "rgba(232, 242, 255, 0.12)");
+    core.addColorStop(0.25, "rgba(110, 168, 255, 0.11)");
     core.addColorStop(1, "rgba(0, 0, 0, 0)");
     context.fillStyle = core;
     context.fillRect(0, 0, width, height);
