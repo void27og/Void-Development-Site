@@ -200,12 +200,14 @@ function initMotionControls() {
     </div>
   `;
   document.body.append(dialog);
+  document.body.classList.add("has-motion-dialog");
 
   const choiceButtons = [...dialog.querySelectorAll("[data-motion-choice]")];
   choiceButtons.forEach((button) => {
     button.addEventListener("click", () => {
       setMotionPreferenceFromChoice(button.dataset.motionChoice === "reduced");
       dialog.remove();
+      document.body.classList.remove("has-motion-dialog");
     });
   });
   choiceButtons[0]?.focus({ preventScroll: true });

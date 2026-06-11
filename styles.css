@@ -45,18 +45,19 @@ body {
   font-family: Inter, Arial, sans-serif;
   line-height: 1.5;
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 220ms ease, transform 220ms ease;
+  transition: opacity 220ms ease;
 }
 
 body.is-ready {
   opacity: 1;
-  transform: translateY(0);
 }
 
 body.is-leaving {
   opacity: 0;
-  transform: translateY(8px);
+}
+
+body.has-motion-dialog {
+  overflow: hidden;
 }
 
 .galaxy-field {
