@@ -204,7 +204,7 @@ main {
   gap: 11px;
   min-width: 0;
   font-family: var(--font-display);
-  font-weight: 900;
+  font-weight: 400;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.72);
 }
 
@@ -617,7 +617,7 @@ body > .motion-dialog {
 .rotary-links a span {
   color: var(--rose);
   font-size: 0.78rem;
-  font-weight: 900;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -724,7 +724,7 @@ h3,
 .project-preview strong,
 .glacier-preview strong {
   font-family: var(--font-display);
-  font-weight: 900;
+  font-weight: 400;
 }
 
 h1 {
@@ -786,7 +786,7 @@ h3 {
   width: fit-content;
   font-size: clamp(1.45rem, 3vw, 2.8rem);
   line-height: 1;
-  font-weight: 900;
+  font-weight: 400;
 }
 
 .galaxy-link-list a:hover,
@@ -813,7 +813,7 @@ h3 {
 .galaxy-creation-link span {
   color: var(--rose);
   font-size: 0.78rem;
-  font-weight: 900;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -934,7 +934,7 @@ h3 {
   color: var(--white);
   font-size: clamp(1.6rem, 3vw, 2.25rem);
   line-height: 1.15;
-  font-weight: 900;
+  font-weight: 400;
   text-transform: uppercase;
 }
 
@@ -1263,7 +1263,7 @@ h3 {
   color: var(--ink);
   background: linear-gradient(135deg, rgba(143, 47, 97, 0.38), rgba(111, 69, 216, 0.26));
   font: inherit;
-  font-weight: 900;
+  font-weight: 400;
   cursor: pointer;
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
@@ -1309,7 +1309,7 @@ h3 {
   color: var(--white);
   background: linear-gradient(135deg, var(--velvet), var(--plum));
   font-size: 3rem;
-  font-weight: 900;
+  font-weight: 400;
 }
 
 .pack-content {
@@ -1358,7 +1358,7 @@ h3 {
 .website-meta a,
 .contact-info a {
   color: var(--rose);
-  font-weight: 900;
+  font-weight: 400;
 }
 
 .loading-card {
@@ -1595,7 +1595,7 @@ h3 {
   color: var(--ink);
   font-size: clamp(1.55rem, 3vw, 3rem);
   line-height: 1.05;
-  font-weight: 900;
+  font-weight: 400;
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.86);
   transition: color 180ms ease, transform 180ms ease, text-shadow 180ms ease;
 }
@@ -1630,7 +1630,7 @@ h3 {
   color: var(--white);
   background: rgba(255, 255, 255, 0.08);
   font: inherit;
-  font-weight: 900;
+  font-weight: 400;
   cursor: help;
 }
 
@@ -1819,12 +1819,12 @@ h3 {
   color: #10203b;
   background: linear-gradient(180deg, #ff9933 0 33%, #ffffff 34% 66%, #138808 67%);
   font-size: 0.58rem;
-  font-weight: 900;
+  font-weight: 400;
 }
 
 .profile-card p {
   margin: -4px 0 2px;
-  font-weight: 900;
+  font-weight: 400;
 }
 
 .discord-button,
