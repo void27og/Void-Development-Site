@@ -502,9 +502,7 @@ body > .motion-dialog {
 }
 
 .home-page .brand,
-.home-page .brand-mark,
-.home-page .abyss-hero h1,
-.home-page .rotary-links a strong {
+.home-page .brand-mark {
   font-weight: 400;
 }
 
@@ -724,7 +722,7 @@ h3,
 .project-preview strong,
 .glacier-preview strong {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 700;
 }
 
 h1 {
@@ -786,7 +784,7 @@ h3 {
   width: fit-content;
   font-size: clamp(1.45rem, 3vw, 2.8rem);
   line-height: 1;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .galaxy-link-list a:hover,
@@ -934,7 +932,7 @@ h3 {
   color: var(--white);
   font-size: clamp(1.6rem, 3vw, 2.25rem);
   line-height: 1.15;
-  font-weight: 400;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -1309,7 +1307,7 @@ h3 {
   color: var(--white);
   background: linear-gradient(135deg, var(--velvet), var(--plum));
   font-size: 3rem;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .pack-content {
@@ -1595,7 +1593,7 @@ h3 {
   color: var(--ink);
   font-size: clamp(1.55rem, 3vw, 3rem);
   line-height: 1.05;
-  font-weight: 400;
+  font-weight: 700;
   text-shadow: 0 4px 28px rgba(0, 0, 0, 0.86);
   transition: color 180ms ease, transform 180ms ease, text-shadow 180ms ease;
 }
